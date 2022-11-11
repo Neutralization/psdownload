@@ -7,11 +7,11 @@ $UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like
 
 $Session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
 $Session.UserAgent = $UA
-$CookieString = ''
+$CookieString = ""
 if (Test-Path $CookieFile) {
     $Cookies = Get-Content -Path $CookieFile
     $Cookies | ForEach-Object {
-        if (!$_.StartsWith('#') -and $_.StartsWith('.bilibili.com')) {
+        if (!$_.StartsWith("#") -and $_.StartsWith(".bilibili.com")) {
             $Cookie = $_.Split("`t")
             $Name = $Cookie[5]
             $Value = $Cookie[6]
@@ -81,14 +81,14 @@ function ABconvert {
 function BiliDown {
     param (
         [parameter(position = 1)]$ID,
-        [parameter(position = 2)]$Part = 1
+        [parameter(position = 2)]$Part = 2
     )
 
-    if ($ID -match '^[aA]') {
+    if ($ID -match "^[aA]") {
         $AID = $ID.Substring(2)
         $BID = ABconvert $ID.Substring(2) $false
     }
-    elseif ($ID -match '^[bB]') {
+    elseif ($ID -match "^[bB]") {
         $AID = ABconvert $ID $true
         $BID = $ID
     }
@@ -122,16 +122,16 @@ function BiliDown {
     # Write-Output $VideoDASH
 
     try {
-        $aria2cArgs = "-x16 -s12 -j20 -k1M --continue --check-certificate=false --file-allocation=none --summary-interval=0 --download-result=hide ""$($AudioDASH)"" --header=""$($UA)"" --header=""Referer: https://www.bilibili.com"" --dir=$($DownloadFolder) --out $($CID)_a.m4s"
-        Start-Process -NoNewWindow -Wait -FilePath 'aria2c.exe' -ArgumentList $aria2cArgs -RedirectStandardError "$($DownloadFolder)/$($CID)_.log"
+        $aria2cArgs = "-x16 -s12 -j20 -k1M --continue --check-certificate=false --file-allocation=none --summary-interval=0 --download-result=hide ""$($AudioDASH)"" --header=""$($UA)"" --header=""Referer: $($Headers.referer)"" --dir=$($DownloadFolder) --out $($CID)_a.m4s"
+        Start-Process -NoNewWindow -Wait -FilePath "aria2c.exe" -ArgumentList $aria2cArgs -RedirectStandardError "$($DownloadFolder)/$($CID)_.log"
 
-        $aria2cArgs = "-x16 -s12 -j20 -k1M --continue --check-certificate=false --file-allocation=none --summary-interval=0 --download-result=hide ""$($VideoDASH)"" --header=""User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101 Firefox/78.0"" --header=""Referer: https://www.bilibili.com"" --dir=$($DownloadFolder) --out $($CID)_v.m4s"
-        Start-Process -NoNewWindow -Wait -FilePath 'aria2c.exe' -ArgumentList $aria2cArgs -RedirectStandardError "$($DownloadFolder)/$($CID)_.log"
+        $aria2cArgs = "-x16 -s12 -j20 -k1M --continue --check-certificate=false --file-allocation=none --summary-interval=0 --download-result=hide ""$($VideoDASH)"" --header=""$($UA)"" --header=""Referer: $($Headers.referer)"" --dir=$($DownloadFolder) --out $($CID)_v.m4s"
+        Start-Process -NoNewWindow -Wait -FilePath "aria2c.exe" -ArgumentList $aria2cArgs -RedirectStandardError "$($DownloadFolder)/$($CID)_.log"
 
         $ffmpegArgs = "-y -hide_banner -i $($DownloadFolder)/$($CID)_a.m4s -i $($DownloadFolder)/$($CID)_v.m4s -c copy $($DownloadFolder)/$($ID).mp4"
-        Start-Process -NoNewWindow -Wait -FilePath 'ffmpeg.exe' -ArgumentList $ffmpegArgs -RedirectStandardError "$($DownloadFolder)/$($CID)_.log"
+        Start-Process -NoNewWindow -Wait -FilePath "ffmpeg.exe" -ArgumentList $ffmpegArgs -RedirectStandardError "$($DownloadFolder)/$($CID)_.log"
     }
-    catch { New-Item -Path "$($DownloadFolder)" -Name "$($BID).txt" -ItemType 'file' -Value '' -Force }
+    catch { New-Item -Path "$($DownloadFolder)" -Name "$($BID).txt" -ItemType "file" -Value "" -Force }
     Remove-Item "$($DownloadFolder)/$($CID)_*.*"
 }
 
