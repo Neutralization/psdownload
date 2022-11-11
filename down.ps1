@@ -107,7 +107,7 @@ function BiliDown {
     # Write-Output $CID
 
     $SourceUrl = "https://api.bilibili.com/x/player/playurl?avid=$($AID)&bvid=$($BID)&cid=$($CID)&qn=120&fnver=0&fnval=4048&fourk=1&voice_balance=1"
-    Write-Output $SourceUrl
+    # Write-Output $SourceUrl
     $VideoData = Invoke-WebRequest -UseBasicParsing -Uri $SourceUrl -WebSession $Session -Headers $Headers |
     Select-Object -ExpandProperty "Content" | ConvertFrom-Json
     Write-Host "$($ID) Video Downloading......"
@@ -143,10 +143,7 @@ function Main {
     if (!(Test-Path $DownloadFolder)) {
         New-Item -Path $DownloadFolder -ItemType "directory"
     }
-    Get-Item -Path "$($DownloadFolder)/*.mp4" | ForEach-Object { 
-        $ExistVideos += $_.BaseName
-        Write-Host "$($_.BaseName) Already Downloaded." -ForegroundColor Yellow
-    }
+    Get-Item -Path "$($DownloadFolder)/*.mp4" | ForEach-Object { $ExistVideos += $_.BaseName }
     $NeedVideos = $RankVideos | Where-Object { $ExistVideos -notcontains $_ }
 
     $NeedVideos | ForEach-Object { BiliDown $_ }
@@ -155,4 +152,3 @@ function Main {
 if (Test-Path $DownloadList) {
     Main
 }
-
