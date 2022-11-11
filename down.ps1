@@ -81,7 +81,7 @@ function ABconvert {
 function BiliDown {
     param (
         [parameter(position = 1)]$ID,
-        [parameter(position = 2)]$Part = 2
+        [parameter(position = 2)]$Part = 1
     )
 
     if ($ID -match "^[aA]") {
